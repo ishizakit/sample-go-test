@@ -1,6 +1,8 @@
 package mock
 
 import (
+	"errors"
+
 	"github.com/TechLoCo/sample-go-test/model"
 	"github.com/stretchr/testify/mock"
 )
@@ -26,6 +28,32 @@ func (u *User) Get(id int) (*model.User, error) {
 type UserGetIO struct {
 	Input  UserGetInput  // 引数
 	Output UserGetOutput // 戻り値
+}
+
+// NewNormalUserGetIO model.Userを元に正常な戻り値のUserGetIOを作成する
+func NewNormalUserGetIO(user model.User) UserGetIO {
+	return UserGetIO{
+		Input: UserGetInput{
+			user.ID,
+		},
+		Output: UserGetOutput{
+			&user,
+			nil,
+		},
+	}
+}
+
+// NewNormalUserGetIO model.Userを元に異常な戻り値のUserGetIOを作成する
+func NewAbnormalUserGetIO(user model.User) UserGetIO {
+	return UserGetIO{
+		Input: UserGetInput{
+			user.ID,
+		},
+		Output: UserGetOutput{
+			nil,
+			errors.New(""),
+		},
+	}
 }
 
 // UserGetInput User.Getの引数を表したstruct

@@ -2,6 +2,7 @@ package service
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -50,30 +51,63 @@ type userGetCase struct {
 }
 
 func userGetCases() []userGetCase {
-	normal := &model.User{
-		ID:    1,
-		Name:  "ishizakit",
-		Email: "example001@example.com",
+	activeUser := model.User{
+		ID:         1,
+		Name:       "ishizakit",
+		Email:      "example001@example.com",
+		LastActive: time.Now(),
 	}
+	active := mock.NewNormalUserGetIO(activeUser)
+
+	nonActiveUser := model.User{
+		ID:         2,
+		Name:       "tishizaki",
+		Email:      "example002@example.com",
+		LastActive: time.Now().AddDate(-2, 0, 0),
+	}
+	nonActive := mock.NewNormalUserGetIO(nonActiveUser)
+
+	abnormalUser := model.User{
+		ID:         0,
+		Name:       "abnormal",
+		Email:      "example000@example.com",
+		LastActive: time.Now(),
+	}
+	abnormal := mock.NewAbnormalUserGetIO(abnormalUser)
+
 	return []userGetCase{
 		{
-			name: "正常系",
+			name: "[正常系] アクティブユーザー",
 			input: userGetInput{
-				id: normal.ID,
+				id: activeUser.ID,
 			},
 			expect: userGetOutput{
-				user: normal,
+				user: &activeUser,
 				err:  nil,
 			},
-			userGetExpect: mock.UserGetIO{
-				Input: mock.UserGetInput{
-					ID: normal.ID,
-				},
-				Output: mock.UserGetOutput{
-					User: normal,
-					Err:  nil,
-				},
+			userGetExpect: active,
+		},
+		{
+			name: "[正常系] 非アクティブユーザー",
+			input: userGetInput{
+				id: nonActiveUser.ID,
 			},
+			expect: userGetOutput{
+				user: nil,
+				err:  nil,
+			},
+			userGetExpect: nonActive,
+		},
+		{
+			name: "[異常系] userMockでエラー発生",
+			input: userGetInput{
+				id: abnormalUser.ID,
+			},
+			expect: userGetOutput{
+				user: nil,
+				err:  abnormal.Output.Err,
+			},
+			userGetExpect: abnormal,
 		},
 	}
 }

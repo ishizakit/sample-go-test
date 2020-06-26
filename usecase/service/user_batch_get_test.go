@@ -55,48 +55,33 @@ type userBatchGetCase struct {
 }
 
 func userBatchGetCases() []userBatchGetCase {
-	active := &model.User{
+	activeUser := model.User{
 		ID:         1,
 		Name:       "ishizakit",
 		Email:      "example001@example.com",
 		LastActive: time.Now(),
 	}
-	nonActive := &model.User{
+	active := mock.NewNormalUserGetIO(activeUser)
+
+	nonActiveUser := model.User{
 		ID:         2,
 		Name:       "tishizaki",
 		Email:      "example002@example.com",
 		LastActive: time.Now().AddDate(-2, 0, 0),
 	}
+	nonActive := mock.NewNormalUserGetIO(nonActiveUser)
+
 	return []userBatchGetCase{
 		{
 			name: "正常系",
 			input: userBatchGetInput{
-				ids: []int{active.ID, nonActive.ID},
+				ids: []int{activeUser.ID, nonActiveUser.ID},
 			},
 			expect: userBatchGetOutput{
-				users: []*model.User{active},
+				users: []*model.User{&activeUser},
 				err:   nil,
 			},
-			userGetExpect: []mock.UserGetIO{
-				{
-					Input: mock.UserGetInput{
-						ID: active.ID,
-					},
-					Output: mock.UserGetOutput{
-						User: active,
-						Err:  nil,
-					},
-				},
-				{
-					Input: mock.UserGetInput{
-						ID: nonActive.ID,
-					},
-					Output: mock.UserGetOutput{
-						User: nonActive,
-						Err:  nil,
-					},
-				},
-			},
+			userGetExpect: []mock.UserGetIO{active, nonActive},
 		},
 	}
 }

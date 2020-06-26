@@ -22,7 +22,7 @@ func (u *userGet) Run(id int) (*model.User, error) {
 		return nil, err
 	}
 
-	if user.IsActive() {
+	if !user.IsActive() {
 		return nil, nil
 	}
 	return user, nil
