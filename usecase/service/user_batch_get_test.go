@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -71,9 +72,17 @@ func userBatchGetCases() []userBatchGetCase {
 	}
 	nonActive := mock.NewNormalUserGetIO(nonActiveUser)
 
+	abnormalUser := model.User{
+		ID:         0,
+		Name:       "abnormal",
+		Email:      "example000@example.com",
+		LastActive: time.Now(),
+	}
+	abnormal := mock.NewAbnormalUserGetIO(abnormalUser)
+
 	return []userBatchGetCase{
 		{
-			name: "正常系",
+			name: "[正常系] アクティブ・非アクティブ",
 			input: userBatchGetInput{
 				ids: []int{activeUser.ID, nonActiveUser.ID},
 			},
@@ -82,6 +91,17 @@ func userBatchGetCases() []userBatchGetCase {
 				err:   nil,
 			},
 			userGetExpect: []mock.UserGetIO{active, nonActive},
+		},
+		{
+			name: "[異常系] Mockでエラー発生",
+			input: userBatchGetInput{
+				ids: []int{abnormalUser.ID},
+			},
+			expect: userBatchGetOutput{
+				users: nil,
+				err:   errors.New(""),
+			},
+			userGetExpect: []mock.UserGetIO{abnormal},
 		},
 	}
 }
