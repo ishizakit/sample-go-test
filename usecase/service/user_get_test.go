@@ -36,6 +36,7 @@ func TestUserGet(t *testing.T) {
 			}
 
 			// モックが呼び出されたことを検証
+			mockUser.AssertNumberOfCalls(t, "Get", 1)
 			mockUser.AssertCalled(t, "Get", c.userGetExpect.Input.ID)
 		})
 	}

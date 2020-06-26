@@ -39,6 +39,7 @@ func TestUserBatchGet(t *testing.T) {
 			}
 
 			// モックが呼び出されたことを検証
+			mockUser.AssertNumberOfCalls(t, "Get", len(c.userGetExpect))
 			for _, userGetExpect := range c.userGetExpect {
 				mockUser.AssertCalled(t, "Get", userGetExpect.Input.ID)
 			}
